@@ -58,36 +58,58 @@ function buscarArchivo(){
 
 let input = document.getElementById("archivo")
 
+if(!input.files.length){
+alert("Selecciona un archivo")
+return
+}
+
 let archivo = input.files[0]
 
 let reader = new FileReader()
 
 reader.onload = function(e){
 
-let texto = e.target.result.split("\n")
+let data = new Uint8Array(e.target.result)
+
+let workbook = XLSX.read(data,{type:"array"})
+
+let hoja = workbook.Sheets[workbook.SheetNames[0]]
+
+let filas = XLSX.utils.sheet_to_json(hoja,{header:1})
+
+let texto = filas.flat().map(x => String(x).toUpperCase())
 
 let resultados = medicamentos.filter(m =>
-texto.includes(m.cum)
+
+texto.some(t =>
+(m.producto && m.producto.toUpperCase().includes(t)) ||
+(m.descripcion && m.descripcion.toUpperCase().includes(t)) ||
+(m.descripcionatc && m.descripcionatc.toUpperCase().includes(t))
 )
 
-let html = ""
+)
+
+let html=""
 
 resultados.forEach(r=>{
 
-let codigo = r.codigo ? r.codigo : "NO TIENE NOPOS"
+let codigo = r.codigo ? r.codigo : "NO EN NOPOS"
 
-html += `
+html+=`
 <div>
-${r.cum} - ${r.producto} - CODIGO: ${codigo}
+${r.producto}<br>
+CUM: ${r.cum}<br>
+CODIGO NOPOS: ${codigo}
 </div>
+<hr>
 `
 
 })
 
-document.getElementById("resultadosArchivo").innerHTML = html
+document.getElementById("resultadosArchivo").innerHTML=html
 
 }
 
-reader.readAsText(archivo)
+reader.readAsArrayBuffer(archivo)
 
 }
