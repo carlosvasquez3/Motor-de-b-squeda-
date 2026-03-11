@@ -77,14 +77,17 @@ let hoja = workbook.Sheets[workbook.SheetNames[0]]
 
 let filas = XLSX.utils.sheet_to_json(hoja,{header:1})
 
-let texto = filas.flat().map(x => String(x).toUpperCase())
+let textos = filas.flat().map(x => String(x).toUpperCase())
 
 let resultados = medicamentos.filter(m =>
 
-texto.some(t =>
+textos.some(t =>
+
 (m.producto && m.producto.toUpperCase().includes(t)) ||
 (m.descripcion && m.descripcion.toUpperCase().includes(t)) ||
-(m.descripcionatc && m.descripcionatc.toUpperCase().includes(t))
+(m.descripcionatc && m.descripcionatc.toUpperCase().includes(t)) ||
+(m.descripcioncomercial && m.descripcioncomercial.toUpperCase().includes(t))
+
 )
 
 )
@@ -97,7 +100,7 @@ let codigo = r.codigo ? r.codigo : "NO EN NOPOS"
 
 html+=`
 <div>
-${r.producto}<br>
+<b>${r.producto}</b><br>
 CUM: ${r.cum}<br>
 CODIGO NOPOS: ${codigo}
 </div>
