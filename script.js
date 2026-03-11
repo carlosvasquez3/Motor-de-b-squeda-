@@ -74,7 +74,7 @@ let html = ""
 
 resultados.forEach(r=>{
 
-let codigo = r.codigo ? r.codigo : "NO EN NOPOS"
+let codigo = r.codigo ? r.codigo : "NO TIENE NOPOS"
 
 html += `
 <div>
