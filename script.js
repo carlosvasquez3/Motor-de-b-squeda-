@@ -1,16 +1,32 @@
 let medicamentos = []
 
-fetch("data/base_medicamentos.json")
-.then(res => res.json())
-.then(data => medicamentos = data)
+async function cargarDatos(){
+
+try{
+
+let res = await fetch("data/base_medicamentos.json")
+medicamentos = await res.json()
+
+console.log("Datos cargados:", medicamentos.length)
+
+}catch(e){
+
+console.error("Error cargando JSON", e)
+
+}
+
+}
+
+cargarDatos()
+
 
 function buscar(){
 
 let texto = document.getElementById("busqueda").value.toUpperCase()
 
 let resultados = medicamentos.filter(m =>
-    (m.producto && m.producto.toUpperCase().includes(texto)) ||
-    (m.cum && m.cum.includes(texto))
+(m.producto && m.producto.toUpperCase().includes(texto)) ||
+(m.cum && m.cum.includes(texto))
 )
 
 let html = ""
@@ -23,7 +39,7 @@ html += `
 <div>
 <b>${r.producto}</b><br>
 CUM: ${r.cum}<br>
-FORMA FARMACEUTICA: ${r.formafarmaceutica}<br>
+FORMA: ${r.formafarmaceutica}<br>
 CODIGO NOPOS: ${codigo}
 </div>
 <hr>
