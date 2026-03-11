@@ -25,11 +25,16 @@ function buscar(){
 let texto = document.getElementById("busqueda").value.toUpperCase()
 
 let resultados = medicamentos.filter(m =>
-(m.producto && m.producto.toUpperCase().includes(texto)) ||
-(m.descripcionatc && m.descripcionatc.toUpperCase().includes(texto)) ||
-(m.descripcioncomercial && m.descripcioncomercial.toUpperCase().includes(texto)) ||
-(m.descripcion && m.descripcion.toUpperCase().includes(texto)) ||
-(m.cum && m.cum.includes(texto))
+
+textos.some(t =>
+
+(m.producto && m.producto.toUpperCase().includes(t)) ||
+(m.descripcion && m.descripcion.toUpperCase().includes(t)) ||
+(m.descripcionatc && m.descripcionatc.toUpperCase().includes(t)) ||
+(m.descripcioncomercial && m.descripcioncomercial.toUpperCase().includes(t))
+
+)
+
 )
 
 let html = ""
