@@ -50,3 +50,41 @@ CODIGO NOPOS: ${codigo}
 document.getElementById("resultados").innerHTML = html
 
 }
+
+function buscarArchivo(){
+
+let input = document.getElementById("archivo")
+
+let archivo = input.files[0]
+
+let reader = new FileReader()
+
+reader.onload = function(e){
+
+let texto = e.target.result.split("\n")
+
+let resultados = medicamentos.filter(m =>
+texto.includes(m.cum)
+)
+
+let html = ""
+
+resultados.forEach(r=>{
+
+let codigo = r.codigo ? r.codigo : "NO EN NOPOS"
+
+html += `
+<div>
+${r.cum} - ${r.producto} - CODIGO: ${codigo}
+</div>
+`
+
+})
+
+document.getElementById("resultadosArchivo").innerHTML = html
+
+}
+
+reader.readAsText(archivo)
+
+}
