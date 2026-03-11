@@ -26,6 +26,8 @@ let texto = document.getElementById("busqueda").value.toUpperCase()
 
 let resultados = medicamentos.filter(m =>
 (m.producto && m.producto.toUpperCase().includes(texto)) ||
+(m.descripcionatc && m.descripcionatc.toUpperCase().includes(texto)) ||
+(m.descripcioncomercial && m.descripcioncomercial.toUpperCase().includes(texto)) ||
 (m.cum && m.cum.includes(texto))
 )
 
@@ -33,7 +35,7 @@ let html = ""
 
 resultados.forEach(r => {
 
-let codigo = r.codigo ? r.codigo : "NO EN NOPOS"
+let codigo = r.codigo ? r.codigo : "NO TIENE NOPOS"
 
 html += `
 <div>
