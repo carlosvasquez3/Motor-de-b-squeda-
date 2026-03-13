@@ -33,7 +33,6 @@ textos.some(t =>
 (m.descripcionatc && m.descripcionatc.toUpperCase().includes(t)) ||
 (m.descripcioncomercial && m.descripcioncomercial.toUpperCase().includes(t))
 
-)
 
 )
 
