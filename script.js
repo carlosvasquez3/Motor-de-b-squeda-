@@ -1,122 +1,113 @@
 let medicamentos = []
 
-async function cargarDatos(){
+// Función para cargar los datos desde el archivo JSON
+async function cargarDatos() {
+  try {
+    let res = await fetch("data/base_medicamentos.json")
+    medicamentos = await res.json()
 
-try{
-
-let res = await fetch("data/base_medicamentos.json")
-medicamentos = await res.json()
-
-console.log("Datos cargados:", medicamentos.length)
-
-}catch(e){
-
-console.error("Error cargando JSON", e)
-
+    console.log("Datos cargados:", medicamentos.length)
+  } catch (e) {
+    console.error("Error cargando JSON", e)
+  }
 }
 
-}
-
+// Llamada para cargar los datos cuando se inicia el script
 cargarDatos()
 
+// Función para realizar la búsqueda de medicamentos
+function buscar() {
+  let texto = document.getElementById("busqueda").value.toUpperCase()
 
-function buscar(){
+  let resultados = medicamentos.filter(m =>
+    (m.producto && m.producto.toUpperCase().includes(texto)) ||
+    (m.descripcion && m.descripcion.toUpperCase().includes(texto)) ||
+    (m.descripcionatc && m.descripcionatc.toUpperCase().includes(texto)) ||
+    (m.descripcioncomercial && m.descripcioncomercial.toUpperCase().includes(texto)) ||
+    (m.cum && m.cum.includes(texto))
+  )
 
-let texto = document.getElementById("busqueda").value.toUpperCase()
+  let html = ""
 
-let resultados = medicamentos.filter(m =>
+  // Si no hay resultados, mostrar un mensaje
+  if (resultados.length === 0) {
+    html = "<p>No se encontraron resultados</p>"
+  } else {
+    // Mostrar los resultados
+    resultados.forEach(r => {
+      let codigo = r.codigo ? r.codigo : "NO TIENE NOPOS"
+      html += `
+        <div>
+          <b>${r.producto}</b><br>
+          CUM: ${r.cum}<br>
+          FORMA: ${r.formafarmaceutica}<br>
+          CODIGO NOPOS: ${codigo}
+        </div>
+        <hr>
+      `
+    })
+  }
 
-textos.some(t =>
-
-(m.producto && m.producto.toUpperCase().includes(t)) ||
-(m.descripcion && m.descripcion.toUpperCase().includes(t)) ||
-(m.descripcionatc && m.descripcionatc.toUpperCase().includes(t)) ||
-(m.descripcioncomercial && m.descripcioncomercial.toUpperCase().includes(t))
-
-
-)
-
-let html = ""
-
-resultados.forEach(r => {
-
-let codigo = r.codigo ? r.codigo : "NO TIENE NOPOS"
-
-html += `
-<div>
-<b>${r.producto}</b><br>
-CUM: ${r.cum}<br>
-FORMA: ${r.formafarmaceutica}<br>
-CODIGO NOPOS: ${codigo}
-</div>
-<hr>
-`
-
-})
-
-document.getElementById("resultados").innerHTML = html
-
+  // Mostrar resultados en el HTML
+  document.getElementById("resultados").innerHTML = html
 }
 
-function buscarArchivo(){
+// Función para procesar el archivo cargado
+function buscarArchivo() {
+  let input = document.getElementById("archivo")
 
-let input = document.getElementById("archivo")
+  // Si no se ha seleccionado archivo, mostrar un mensaje
+  if (!input.files.length) {
+    alert("Selecciona un archivo")
+    return
+  }
 
-if(!input.files.length){
-alert("Selecciona un archivo")
-return
-}
+  let archivo = input.files[0]
+  let reader = new FileReader()
 
-let archivo = input.files[0]
+  reader.onload = function (e) {
+    // Leer el contenido del archivo Excel
+    let data = new Uint8Array(e.target.result)
+    let workbook = XLSX.read(data, { type: "array" })
+    let hoja = workbook.Sheets[workbook.SheetNames[0]]
+    let filas = XLSX.utils.sheet_to_json(hoja, { header: 1 })
 
-let reader = new FileReader()
+    // Obtener todos los textos del archivo y convertir a mayúsculas
+    let textos = filas.flat().map(x => String(x).toUpperCase())
 
-reader.onload = function(e){
+    let resultados = medicamentos.filter(m =>
+      textos.some(t =>
+        (m.producto && m.producto.toUpperCase().includes(t)) ||
+        (m.descripcionatc && m.descripcionatc.toUpperCase().includes(t)) ||
+        (m.descripcioncomercial && m.descripcioncomercial.toUpperCase().includes(t)) ||
+        (m.descripcion && m.descripcion.toUpperCase().includes(t)) ||
+        (m.cum && m.cum.includes(t))
+      )
+    )
 
-let data = new Uint8Array(e.target.result)
+    let html = ""
 
-let workbook = XLSX.read(data,{type:"array"})
+    // Si no se encuentran resultados
+    if (resultados.length === 0) {
+      html = "<p>No se encontraron resultados</p>"
+    } else {
+      // Mostrar los resultados
+      resultados.forEach(r => {
+        let codigo = r.codigo ? r.codigo : "NO EN NOPOS"
+        html += `
+          <div>
+            <b>${r.producto}</b><br>
+            CUM: ${r.cum}<br>
+            CODIGO NOPOS: ${codigo}
+          </div>
+          <hr>
+        `
+      })
+    }
 
-let hoja = workbook.Sheets[workbook.SheetNames[0]]
+    // Mostrar resultados en el HTML
+    document.getElementById("resultadosArchivo").innerHTML = html
+  }
 
-let filas = XLSX.utils.sheet_to_json(hoja,{header:1})
-
-let textos = filas.flat().map(x => String(x).toUpperCase())
-
-let resultados = medicamentos.filter(m =>
-
-textos.some(t =>
-
-(m.producto && m.producto.toUpperCase().includes(t)) ||
-(m.descripcion && m.descripcion.toUpperCase().includes(t)) ||
-(m.descripcionatc && m.descripcionatc.toUpperCase().includes(t)) ||
-(m.descripcioncomercial && m.descripcioncomercial.toUpperCase().includes(t))
-
-)
-
-)
-
-let html=""
-
-resultados.forEach(r=>{
-
-let codigo = r.codigo ? r.codigo : "NO EN NOPOS"
-
-html+=`
-<div>
-<b>${r.producto}</b><br>
-CUM: ${r.cum}<br>
-CODIGO NOPOS: ${codigo}
-</div>
-<hr>
-`
-
-})
-
-document.getElementById("resultadosArchivo").innerHTML=html
-
-}
-
-reader.readAsArrayBuffer(archivo)
-
+  reader.readAsArrayBuffer(archivo)
 }
