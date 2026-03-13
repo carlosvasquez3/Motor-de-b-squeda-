@@ -18,6 +18,8 @@ cargarDatos()
 // Función para realizar la búsqueda de medicamentos
 function buscar() {
   let texto = document.getElementById("busqueda").value.toUpperCase()
+  
+  console.log("Buscando por: ", texto)
 
   let resultados = medicamentos.filter(m =>
     (m.producto && m.producto.toUpperCase().includes(texto)) ||
@@ -27,13 +29,14 @@ function buscar() {
     (m.cum && m.cum.includes(texto))
   )
 
+  console.log("Resultados encontrados: ", resultados)
+
   let html = ""
 
   // Si no hay resultados, mostrar un mensaje
   if (resultados.length === 0) {
     html = "<p>No se encontraron resultados</p>"
   } else {
-    // Mostrar los resultados
     resultados.forEach(r => {
       let codigo = r.codigo ? r.codigo : "NO TIENE NOPOS"
       html += `
@@ -47,6 +50,9 @@ function buscar() {
       `
     })
   }
+
+  document.getElementById("resultados").innerHTML = html
+}
 
   // Mostrar resultados en el HTML
   document.getElementById("resultados").innerHTML = html
